@@ -162,7 +162,7 @@ mycloud/
 ### 1. Клонирование репозитория
 
 ```bash
-git clone https://github.com/ваш-username/mycloud.git
+git clone https://github.com/danroman-github/mycloud.git
 cd mycloud
 ```
 
