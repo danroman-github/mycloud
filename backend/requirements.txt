@@ -12,3 +12,4 @@ whitenoise>=6.6,<7.0
 
 # Утилиты
 python-dotenv>=1.0,<2.0
+gunicorn>=21.2,<22.0
