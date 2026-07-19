@@ -97,7 +97,11 @@ const filesSlice = createSlice({
             })
             .addCase(fetchFiles.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                if (action.payload?.status_code === 403) {
+                    state.error = null;
+                } else {
+                    state.error = action.payload;
+                }
             })
             .addCase(uploadFile.fulfilled, (state, action) => {
                 state.files.unshift(action.payload);

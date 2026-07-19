@@ -24,7 +24,11 @@ const Dashboard = () => {
     const [newComment, setNewComment] = useState('');
 
     useEffect(() => {
-        dispatch(fetchFiles());
+        const timer = setTimeout(() => {
+            dispatch(fetchFiles());
+        }, 500);
+    
+        return () => clearTimeout(timer);
     }, [dispatch]);
 
     const handleFileSelect = (e) => {

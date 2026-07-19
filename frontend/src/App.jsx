@@ -33,10 +33,12 @@ function App() {
   const { isInitialized } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (!isInitialized) {
+    const timer = setTimeout(() => {
       dispatch(getCurrentUser());
-    }
-  }, [dispatch, isInitialized]);
+    }, 200);
+    
+    return () => clearTimeout(timer);
+  }, [dispatch]);
 
   return (
     <BrowserRouter>
