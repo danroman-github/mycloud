@@ -71,18 +71,15 @@ const Dashboard = () => {
 
     const copyToClipboard = async (text) => {
         try {
-            // Пытаемся использовать современный API (работает на HTTPS и localhost)
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(text);
                 alert('✅ Ссылка скопирована в буфер обмена!');
                 return;
             }
 
-            // Fallback для HTTP (старый, но надёжный метод)
             const textArea = document.createElement('textarea');
             textArea.value = text;
 
-            // Делаем textarea невидимым, но доступным для копирования
             textArea.style.position = 'fixed';
             textArea.style.top = '0';
             textArea.style.left = '0';
