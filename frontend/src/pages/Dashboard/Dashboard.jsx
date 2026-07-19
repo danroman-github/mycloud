@@ -69,9 +69,48 @@ const Dashboard = () => {
         await dispatch(generateShareLink(fileId));
     };
 
-    const copyToClipboard = (text) => {
-        navigator.clipboard.writeText(text);
-        alert('Ссылка скопирована в буфер обмена!');
+    const copyToClipboard = async (text) => {
+        try {
+            // Пытаемся использовать современный API (работает на HTTPS и localhost)
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                alert('✅ Ссылка скопирована в буфер обмена!');
+                return;
+            }
+
+            // Fallback для HTTP (старый, но надёжный метод)
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+
+            // Делаем textarea невидимым, но доступным для копирования
+            textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.padding = '0';
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
+            textArea.style.opacity = '0';
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            if (successful) {
+                alert('✅ Ссылка скопирована в буфер обмена!');
+            } else {
+                alert('❌ Не удалось скопировать ссылку. Скопируйте вручную: ' + text);
+            }
+        } catch (err) {
+            console.error('Ошибка копирования:', err);
+            alert('❌ Не удалось скопировать ссылку. Скопируйте вручную: ' + text);
+        }
     };
 
     const handleDownload = (fileId) => {
