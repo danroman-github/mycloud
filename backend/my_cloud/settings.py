@@ -260,3 +260,21 @@ LOGGING = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 1209600  # 2 недели в секундах
 SESSION_SAVE_EVERY_REQUEST = True
+
+# ============================================================================
+# MIME types that the browser can display directly
+# ============================================================================
+VIEWABLE_MIME_TYPES = [
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
+    'text/plain',
+    'text/html',
+    'video/mp4',
+    'video/webm',
+    'audio/mpeg',
+    'audio/wav',
+]

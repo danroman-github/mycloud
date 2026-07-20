@@ -7,6 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import FileResponse, Http404
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from .models import File
 from .serializers import (
     FileSerializer,
@@ -161,11 +162,19 @@ class FileDownloadView(APIView):
             f'Пользователь {request.user.username} скачал файл: {file_instance.display_name}'
         )
 
+        view_mode = request.GET.get('view') == '1'
+        can_view_inline = file_instance.mime_type in settings.VIEWABLE_MIME_TYPES
+        as_attachment = not (view_mode and can_view_inline)
+
         response = FileResponse(
             open(file_instance.file.path, 'rb'),
-            as_attachment=True,
-            filename=file_instance.original_name
+            as_attachment=as_attachment,
+            content_type=file_instance.mime_type
         )
+
+        if as_attachment:
+            response['Content-Disposition'] = 
+                f'attachment; filename="{file_instance.original_name}"'
         
         return response
 
@@ -213,11 +222,20 @@ class PublicFileDownloadView(APIView):
             f'Файл скачан по публичной ссылке: {file_instance.display_name} '
             f'(UUID: {public_hash})'
         )
+
+        view_mode = request.GET.get('view') == '1'
+        can_view_inline = file_instance.mime_type in settings.VIEWABLE_MIME_TYPES
+        as_attachment = not (view_mode and can_view_inline)
         
         response = FileResponse(
             open(file_instance.file.path, 'rb'),
             as_attachment=True,
-            filename=file_instance.original_name
+            content_type=file_instance.mime_type
         )
+
+        if as_attachment:
+            response['Content-Disposition'] = 
+                f'attachment; filename="{file_instance.original_name}"'
+        
         
         return response

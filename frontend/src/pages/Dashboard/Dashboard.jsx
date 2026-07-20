@@ -27,7 +27,7 @@ const Dashboard = () => {
         const timer = setTimeout(() => {
             dispatch(fetchFiles());
         }, 500);
-    
+
         return () => clearTimeout(timer);
     }, [dispatch]);
 
@@ -120,6 +120,25 @@ const Dashboard = () => {
 
     const handleView = (fileId) => {
         window.open(filesAPI.getViewUrl(fileId), '_blank');
+    };
+
+    const VIEWABLE_MIME_TYPES = [
+        'application/pdf',
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/svg+xml',
+        'text/plain',
+        'text/html',
+        'video/mp4',
+        'video/webm',
+        'audio/mpeg',
+        'audio/wav',
+    ];
+
+    const handleView = (fileId) => {
+        window.open(`${API_BASE_URL}/api/files/${fileId}/download/?view=1`, '_blank');
     };
 
     return (
@@ -224,7 +243,7 @@ const Dashboard = () => {
                                     </button>
 
                                     {/* 🔥 КНОПКА ПРОСМОТР - показывается только для viewable файлов */}
-                                    {file.is_viewable_in_browser && (
+                                    {VIEWABLE_MIME_TYPES.includes(file.mime_type) && (
                                         <button
                                             className="btn btn-small btn-info"
                                             onClick={() => handleView(file.id)}
