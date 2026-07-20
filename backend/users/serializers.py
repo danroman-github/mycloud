@@ -39,9 +39,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if len(value) < 6:
             raise serializers.ValidationError('Пароль должен содержать минимум 6 символов.')
         
-        if not re.search(r'[A-ZА-Я]', value):
+        if not re.search(r'[A-Z]', value):
             raise serializers.ValidationError(
-                'Пароль должен содержать хотя бы одну заглавную букву.'
+                'Пароль должен содержать хотя бы одну заглавную букву (A-Z).'
             )
         
         if not re.search(r'\d', value):
