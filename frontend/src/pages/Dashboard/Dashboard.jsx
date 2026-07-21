@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import {
     fetchFiles,
     uploadFile,
@@ -15,6 +16,8 @@ const Dashboard = () => {
     const dispatch = useDispatch();
     const { files, isLoading, error } = useSelector((state) => state.files);
     const { user } = useSelector((state) => state.auth);
+    const [searchParams] = useSearchParams();
+    const userIdParam = searchParams.get('user_id');
 
     const [showUploadForm, setShowUploadForm] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -118,10 +121,6 @@ const Dashboard = () => {
         window.open(filesAPI.getDownloadUrl(fileId), '_blank');
     };
 
-    const handleView = (fileId) => {
-        window.open(filesAPI.getViewUrl(fileId), '_blank');
-    };
-
     const VIEWABLE_MIME_TYPES = [
         'application/pdf',
         'image/jpeg',
@@ -138,7 +137,7 @@ const Dashboard = () => {
     ];
 
     const handleView = (fileId) => {
-        window.open(`${API_BASE_URL}/api/files/${fileId}/download/?view=1`, '_blank');
+        window.open(filesAPI.getViewUrl(fileId), '_blank');
     };
 
     return (

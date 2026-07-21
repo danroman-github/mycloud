@@ -36,10 +36,10 @@ class FileListView(generics.ListAPIView):
         
         if user.is_admin and user_id:
             logger.info(f'Админ {user.username} запрашивает файлы пользователя {user_id}')
-            return File.objects.filter(owner_id=user_id)
+            return File.objects.filter(owner_id=user_id).order_by('-uploaded_at')
         
         logger.debug(f'Пользователь {user.username} запрашивает свои файлы')
-        return File.objects.filter(owner=user)
+        return File.objects.filter(owner=user).order_by('-uploaded_at')
 
 
 class FileUploadView(generics.CreateAPIView):

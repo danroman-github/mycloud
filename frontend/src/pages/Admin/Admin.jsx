@@ -102,6 +102,15 @@ const Admin = () => {
                                 <td>{formatFileSize(u.files_total_size)}</td>
                                 <td>
                                     <div className="action-buttons">
+                                        <a
+                                            href={`/dashboard?user_id=${u.id}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="btn btn-small btn-info"
+                                            style={{ marginLeft: '5px' }}
+                                        >
+                                            📂 Файлы
+                                        </a>
                                         <button
                                             className="btn btn-small btn-danger"
                                             onClick={() => handleDeleteUser(u.id, u.username)}
