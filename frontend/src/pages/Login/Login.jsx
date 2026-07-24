@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, clearError } from '../../store/slices/authSlice';
-import './Login.css';
+import styles from './Login.module.css';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -33,49 +33,59 @@ const Login = () => {
     };
 
     return (
-        <div className="login-page">
-            <div className="login-container">
-                <h2>Вход в систему</h2>
+        <div className={styles.page}>
+            <div className={styles.container}>
+                <h2 className={styles.title}>Вход в систему</h2>
 
                 {error && (
-                    <div className="error-message">
-                        {error.detail?.detail || error.detail?.non_field_errors?.[0] || 'Ошибка входа'}
+                    <div className={styles.error}>
+                        {
+                            error.detail?.detail ||
+                            error.detail?.non_field_errors?.[0] ||
+                            'Ошибка входа'
+                        }
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="login-form">
-                    <div className="form-group">
-                        <label htmlFor="username">Логин</label>
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="username" className={styles.label}>Логин</label>
                         <input
                             type="text"
                             id="username"
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
+                            className={styles.input}
                             required
                             disabled={isLoading}
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="password">Пароль</label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="password" className={styles.label}>Пароль</label>
                         <input
                             type="password"
                             id="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
+                            className={styles.input}
                             required
                             disabled={isLoading}
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                    <button
+                        type="submit"
+                        className={`${styles.button} ${isLoading ? styles.buttonDisabled : ''}`}
+                        disabled={isLoading}
+                    >
                         {isLoading ? 'Вход...' : 'Войти'}
                     </button>
                 </form>
 
-                <p className="login-footer">
+                <p className={styles.footer}>
                     Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
                 </p>
             </div>

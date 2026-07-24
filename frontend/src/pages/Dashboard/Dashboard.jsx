@@ -10,7 +10,7 @@ import {
     generateShareLink,
 } from '../../store/slices/filesSlice';
 import { filesAPI } from '../../api/client';
-import './Dashboard.css';
+import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -28,11 +28,11 @@ const Dashboard = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            dispatch(fetchFiles());
+            dispatch(fetchFiles(userIdParam));
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [dispatch]);
+    }, [dispatch, userIdParam]);
 
     const handleFileSelect = (e) => {
         setSelectedFile(e.target.files[0]);
@@ -141,9 +141,9 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="dashboard">
-            <div className="dashboard-header">
-                <h1>Мои файлы</h1>
+        <div className={styles.dashboard}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Мои файлы</h1>
                 <button
                     className="btn btn-primary"
                     onClick={() => setShowUploadForm(!showUploadForm)}
@@ -152,16 +152,20 @@ const Dashboard = () => {
                 </button>
             </div>
 
-            {error && <div className="error-message">{error.message || 'Ошибка'}</div>}
+            {error &&
+                <div className={styles.errorMessage}>
+                    {error.message || 'Ошибка'}
+                </div>
+            }
 
             {showUploadForm && (
-                <div className="upload-form">
+                <div className={styles.uploadForm}>
                     <form onSubmit={handleUpload}>
-                        <div className="form-group">
+                        <div className={styles.formGroup}>
                             <label>Выберите файл:</label>
                             <input type="file" onChange={handleFileSelect} required />
                         </div>
-                        <div className="form-group">
+                        <div className={styles.formGroup}>
                             <label>Комментарий:</label>
                             <textarea
                                 value={comment}
@@ -169,26 +173,29 @@ const Dashboard = () => {
                                 rows="3"
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                        <button
+                            type="submit" className="btn btn-primary"
+                            disabled={isLoading}
+                        >
                             {isLoading ? 'Загрузка...' : 'Загрузить'}
                         </button>
                     </form>
                 </div>
             )}
 
-            {isLoading && <div className="loading">Загрузка...</div>}
+            {isLoading && <div className={styles.loading}>Загрузка...</div>}
 
             {!isLoading && files.length === 0 && (
-                <div className="empty-state">
+                <div className={styles.emptyState}>
                     <p>У вас пока нет файлов. Загрузите первый файл!</p>
                 </div>
             )}
 
-            <div className="files-list">
+            <div className={styles.filesList}>
                 {files.map((file) => (
-                    <div key={file.id} className="file-card">
+                    <div key={file.id} className={styles.fileCard}>
                         {editingFile === file.id ? (
-                            <div className="edit-form">
+                            <div className={styles.editForm}>
                                 <input
                                     type="text"
                                     value={newName}
@@ -221,9 +228,9 @@ const Dashboard = () => {
                             </div>
                         ) : (
                             <>
-                                <div className="file-info">
-                                    <h3>{file.display_name}</h3>
-                                    <p className="file-meta">
+                                <div className={styles.fileInfo}>
+                                    <h3 className={styles.fileName}>{file.display_name}</h3>
+                                    <p className={styles.fileMeta}>
                                         <span>Размер: {file.size_formatted}</span>
                                         <span>Загружен: {new Date(file.uploaded_at).toLocaleString('ru-RU')}</span>
                                         {file.last_downloaded_at && (
@@ -233,15 +240,14 @@ const Dashboard = () => {
                                             </span>
                                         )}
                                     </p>
-                                    {file.comment && <p className="file-comment">{file.comment}</p>}
+                                    {file.comment && <p className={styles.fileComment}>{file.comment}</p>}
                                 </div>
 
-                                <div className="file-actions">
+                                <div className={styles.fileActions}>
                                     <button className="btn btn-small" onClick={() => handleDownload(file.id)}>
                                         ⬇️ Скачать
                                     </button>
 
-                                    {/* 🔥 КНОПКА ПРОСМОТР - показывается только для viewable файлов */}
                                     {VIEWABLE_MIME_TYPES.includes(file.mime_type) && (
                                         <button
                                             className="btn btn-small btn-info"
@@ -274,8 +280,13 @@ const Dashboard = () => {
                                 </div>
 
                                 {file.public_url && (
-                                    <div className="file-share-link">
-                                        <input type="text" value={file.public_url} readOnly />
+                                    <div className={styles.shareLink}>
+                                        <input
+                                            type="text"
+                                            value={file.public_url}
+                                            readOnly
+                                            className={styles.shareInput}
+                                        />
                                         <button
                                             className="btn btn-small"
                                             onClick={() => copyToClipboard(file.public_url)}

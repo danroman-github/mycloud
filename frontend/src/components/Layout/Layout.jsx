@@ -4,9 +4,9 @@ import './Layout.css';
 
 const Layout = () => {
     return (
-        <div className="layout">
+        <div className={styles.layout}>
             <Navigation />
-            <main className="main-content">
+            <main className={styles.mainContent}>
                 <Outlet />
             </main>
         </div>

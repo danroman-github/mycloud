@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { usersAPI } from '../../api/client';
-import './Admin.css';
+import styles from './Admin.module.css';
 
 const Admin = () => {
     const [users, setUsers] = useState([]);
@@ -57,51 +57,54 @@ const Admin = () => {
     };
 
     if (isLoading) {
-        return <div className="loading">Загрузка...</div>;
+        return <div className={styles.loading}>Загрузка...</div>;
     }
 
     return (
-        <div className="admin-page">
-            <h1>Админ-панель</h1>
+        <div className={styles.page}>
+            <h1 className={styles.title}>Админ-панель</h1>
 
-            <div className="admin-info">
-                <p>Ваш статус: <strong>{user?.is_admin ? 'Администратор' : 'Обычный пользователь'}</strong></p>
+            <div className={styles.info}>
+                <p>
+                    Ваш статус: <strong>{user?.is_admin ?
+                        'Администратор' : 'Обычный пользователь'}</strong>
+                </p>
             </div>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className={styles.errorMessage}>{error}</div>}
 
-            <div className="users-table-container">
-                <table className="users-table">
+            <div className={styles.tableWrapper}>
+                <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Логин</th>
-                            <th>Полное имя</th>
-                            <th>Email</th>
-                            <th>Админ</th>
-                            <th>Файлов</th>
-                            <th>Размер</th>
-                            <th>Действия</th>
+                            <th className={styles.th}>ID</th>
+                            <th className={styles.th}>Логин</th>
+                            <th className={styles.th}>Полное имя</th>
+                            <th className={styles.th}>Email</th>
+                            <th className={styles.th}>Админ</th>
+                            <th className={styles.th}>Файлов</th>
+                            <th className={styles.th}>Размер</th>
+                            <th className={styles.th}>Действия</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((u) => (
-                            <tr key={u.id}>
-                                <td>{u.id}</td>
-                                <td>{u.username}</td>
-                                <td>{u.full_name}</td>
-                                <td>{u.email}</td>
-                                <td>
+                            <tr key={u.id} className={styles.tr}>
+                                <td className={styles.td}>{u.id}</td>
+                                <td className={styles.td}>{u.username}</td>
+                                <td className={styles.td}>{u.full_name}</td>
+                                <td className={styles.td}>{u.email}</td>
+                                <td className={styles.td}>
                                     <input
                                         type="checkbox"
                                         checked={u.is_admin}
                                         onChange={() => handleToggleAdmin(u.id, u.is_admin)}
                                     />
                                 </td>
-                                <td>{u.files_count}</td>
-                                <td>{formatFileSize(u.files_total_size)}</td>
-                                <td>
-                                    <div className="action-buttons">
+                                <td className={styles.td}>{u.files_count}</td>
+                                <td className={styles.td}>{formatFileSize(u.files_total_size)}</td>
+                                <td className={styles.td}>
+                                    <div className={styles.actionButtons}>
                                         <a
                                             href={`/dashboard?user_id=${u.id}`}
                                             target="_blank"
@@ -126,7 +129,7 @@ const Admin = () => {
                     </tbody>
                 </table>
                 {users.length === 0 && !error && (
-                    <p className="empty-state">Пользователи не найдены</p>
+                    <p className={styles.emptyState}>Пользователи не найдены</p>
                 )}
             </div>
         </div>
