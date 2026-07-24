@@ -6,6 +6,9 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ============================================================================
+# Security Settings
+# ============================================================================
 SECRET_KEY = os.environ.get(
     'DJANGO_SECRET_KEY',
     'django-insecure-dev-key-change-in-production-abc123xyz'
@@ -13,8 +16,19 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+def get_list_from_env(env_var: str, default: str) -> list:
+    return [item.strip() for item in os.environ.get(env_var, default).split(',') if item.strip()]
 
+ALLOWED_HOSTS = get_list_from_env('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+
+CSRF_TRUSTED_ORIGINS = get_list_from_env(
+    'CSRF_TRUSTED_ORIGINS', 
+    'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000'
+)
+
+# ============================================================================
+# Application Definition
+# ============================================================================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

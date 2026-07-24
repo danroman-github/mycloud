@@ -1,4 +1,4 @@
-# My Cloud — Облачное хранилище файлов
+# ☁️ My Cloud — Облачное хранилище файлов
 
 Веб-приложение для облачного хранения файлов с возможностью загрузки, скачивания, управления и обмена файлами через публичные ссылки.
 
@@ -108,49 +108,23 @@ mycloud/
 
 │ ├── src/
 
-│ │ ├── api/
+│ │ ├── api/ # API клиент (Axios)
 
-│ │ │ └── client.js # API клиент (Axios)
+│ │ ├── components/ # Используемые компоненты
 
-│ │ ├── components/
+│ │ ├── pages/ # Страницы (Home, Login, Register, Dashboard, Admin)
 
-│ │ │ ├── Layout/ # Общий layout
-
-│ │ │ └── Navigation/ # Навигационное меню
-
-│ │ ├── pages/
-
-│ │ │ ├── Home/ # Главная страница
-
-│ │ │ ├── Login/ # Вход
-
-│ │ │ ├── Register/ # Регистрация
-
-│ │ │ ├── Dashboard/ # Управление файлами
-
-│ │ │ └── Admin/ # Админ-панель
-
-│ │ ├── store/
-
-│ │ │ ├── index.js # Redux store
-
-│ │ │ └── slices/
-
-│ │ │ ├── authSlice.js # Аутентификация
-
-│ │ │ └── filesSlice.js # Файлы
+│ │ ├── store/ # Redux store и slices
 
 │ │ ├── App.jsx # Корневой компонент
 
 │ │ └── main.jsx # Точка входа
 
-│ └── dist/ # Собранный бандл (не в git)
-
 │
 
 └── README.md # Этот файл
 
-## 🚀 Установка и запуск
+## 🚀 Локальная установка (разработка)
 
 ### Предварительные требования
 
@@ -212,9 +186,14 @@ GRANT ALL PRIVILEGES ON DATABASE my_cloud_db TO mycloud_user;
 
 ```end
 # Django settings
-DEBUG=True
+DEBUG=False
 DJANGO_SECRET_KEY=ваш-секретный-ключ-минимум-50-символов
-ALLOWED_HOSTS=localhost,127.0.0.1
+
+# List of allowed hosts
+ALLOWED_HOSTS=185-20-227-198.cloudvps.regruhosting.ru,localhost,127.0.0.1
+
+# List of trusted sources for CSRF tokens
+CSRF_TRUSTED_ORIGINS=http://185-20-227-198.cloudvps.regruhosting.ru
 
 # Database
 DB_NAME=my_cloud_db
@@ -363,49 +342,52 @@ Frontend доступен по адресу: http://localhost:5173
 Оригинальные имена сохраняются в БД
 На диске файлы хранятся с UUID-именами для избежания конфликтов
 
-### 🌐 Деплой на продакшен
+### 🌐 Production-развертывание
 
-#### Подготовка
+#### 1. Подготовка сервера (Ubuntu)
 
-1. Установите DEBUG=False в .env
-2. Сгенерируйте новый DJANGO_SECRET_KEY
-3. Настройте ALLOWED_HOSTS с вашим доменом
-4. Соберите frontend: npm run build
-5. Скопируйте frontend/dist/ в backend/static/
-6. Соберите статики Django: python manage.py collectstatic --noinput
+Установите Python, Pip, Nginx, PostgreSQL и Gunicorn. Клонируйте репозиторий.
 
-#### Настройка Nginx
+#### 2. Настройка .env для Production
 
-Пример конфигурации:
+Файл backend/.env должен содержать следующие параметры:
 
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
+```ini
+DEBUG=False
+DJANGO_SECRET_KEY=<сгенерируйте_новый_ключ>_python_-c_"from_django.core.management.utils_import_get_random_secret_key;_print(get_random_secret_key())"
 
-    location /static/ {
-        alias /path/to/mycloud/backend/staticfiles/;
-    }
+# Укажите ваш домен и IP сервера
+ALLOWED_HOSTS=mycloud.example.com,185.20.227.198,localhost,127.0.0.1
 
-    location /media/ {
-        alias /path/to/mycloud/backend/media_storage/;
-    }
+# Укажите полные URL с протоколом (http или https)
+CSRF_TRUSTED_ORIGINS=https://mycloud.example.com,http://185.20.227.198
 
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+# Настройки БД продакшена
+DB_NAME=my_cloud_prod
+DB_USER=prod_user
+DB_PASSWORD=<сложный_пароль>
+DB_HOST=localhost
+DB_PORT=5432
+
+MEDIA_STORAGE_ROOT=/home/mycloud/mycloud/backend/media_storage
 ```
 
-#### Запуск Gunicorn
+#### 3. Сборка и запуск
 
 ```bash
-cd backend
-gunicorn my_cloud.wsgi:application --bind 127.0.0.1:8000 --workers 3
+# Сборка фронтенда
+cd frontend && npm run build
+cp -r dist/* ../backend/static/frontend/
+cp dist/index.html ../backend/templates/
+
+# Сборка статики Django
+cd ../backend
+source venv/bin/activate
+python manage.py collectstatic --noinput
+
+# Запуск через Gunicorn + Nginx
+sudo systemctl start mycloud
+sudo systemctl restart nginx
 ```
 
 ### 📸 Скриншоты
