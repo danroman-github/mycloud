@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { register, clearError } from '../../store/slices/authSlice';
-import style from './Register.module.css';
+import styles from './Register.module.css';
 
 const Register = () => {
     const dispatch = useDispatch();
@@ -25,8 +25,14 @@ const Register = () => {
 
         switch (name) {
             case 'username':
-                if (value && !/^[a-zA-Z][a-zA-Z0-9]{3,19}$/.test(value)) {
-                    error = 'Логин: 4-20 символов, начинается с буквы, только латиница и цифры';
+                if (value) {
+                    if (!/^[a-zA-Z]/.test(value)) {
+                        error = 'Логин должен начинаться с латинской буквы';
+                    } else if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(value)) {
+                        error = 'Только латинские буквы и цифры';
+                    } else if (value.length < 4 || value.length > 20) {
+                        error = 'Длина от 4 до 20 символов';
+                    }
                 }
                 break;
             case 'email':
@@ -39,7 +45,7 @@ const Register = () => {
                     if (value.length < 6) {
                         error = 'Пароль должен содержать минимум 6 символов';
                     } else if (!/[A-Z]/.test(value)) {
-                        error = 'Пароль должен содержать хотя бы одну заглавную букву';
+                        error = 'Нужна латинская заглавная буква (A-Z)';
                     } else if (!/\d/.test(value)) {
                         error = 'Пароль должен содержать хотя бы одну цифру';
                     } else if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) {
@@ -58,16 +64,6 @@ const Register = () => {
         return error;
     };
 
-    const validateAll = () => {
-        const errors = {};
-        Object.keys(formData).forEach(key => {
-            const err = validateField(key, formData[key], formData);
-            if (err) errors[key] = err;
-        });
-        setValidationErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -81,13 +77,11 @@ const Register = () => {
             setTouched(prev => ({ ...prev, [name]: true }));
         }
 
-        if (touched[name] || value.length > 0) {
-            const fieldError = validateField(name, value, newFormData);
-            setValidationErrors(prev => ({
-                ...prev,
-                [name]: fieldError,
-            }));
-        }
+        const fieldError = validateField(name, value, newFormData);
+        setValidationErrors(prev => ({
+            ...prev,
+            [name]: fieldError,
+        }));
     };
 
     const handleBlur = (e) => {
@@ -105,22 +99,25 @@ const Register = () => {
         e.preventDefault();
         dispatch(clearError());
 
-        if (!validateAll()) {
-            const allTouched = {};
-            Object.keys(formData).forEach(key => allTouched[key] = true);
-            setTouched(allTouched);
+        const finalErrors = {};
+        Object.keys(formData).forEach(key => {
+            const err = validateField(key, formData[key], formData);
+            if (err) finalErrors[key] = err;
+        });
+
+        if (Object.keys(finalErrors).length > 0) {
+            setValidationErrors(finalErrors);
+            setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
             return;
         }
 
         const result = await dispatch(register(formData));
-
         if (register.fulfilled.match(result)) {
             navigate('/dashboard');
         }
     };
 
-    const hasErrors = Object.values(validationErrors).
-        some(err => err !== null && err !== undefined);
+    const hasErrors = Object.values(validationErrors).some(err => err);
 
     return (
         <div className={styles.page}>
@@ -146,6 +143,7 @@ const Register = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             className={`${styles.input} ${validationErrors.username ? styles.inputError : ''}`}
+                            placeholder="user123"
                             required
                             disabled={isLoading}
                         />
@@ -202,12 +200,11 @@ const Register = () => {
                             required
                             disabled={isLoading}
                         />
-                        {validationErrors.password && (
+                        {validationErrors.password ? (
                             <span className={styles.errorText}>{validationErrors.password}</span>
-                        )}
-                        {!validationErrors.password && formData.password && (
+                        ) : formData.password ? (
                             <small style={{ color: 'green' }}>✅ Пароль соответствует требованиям</small>
-                        )}
+                        ) : null}
                     </div>
 
                     <div className={styles.formGroup}>
